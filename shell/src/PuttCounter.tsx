@@ -3,6 +3,7 @@ import { Grid, Button, Typography, Box, Paper } from '@material-ui/core';
 import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon } from '@material-ui/icons';
 import styled from '@emotion/styled';
 import numeral from 'numeral';
+import { get, set } from 'idb-keyval';
 
 const Container = styled.div`
   position: absolute;
@@ -44,32 +45,52 @@ const Container = styled.div`
 `;
 
 type repSetType = {
+  createdAt: Date;
   hits: number;
   misses: number;
   repGoal: number;
-  undo: repSetType | null;
-};
+  undo: repSetType;
+} | undefined;
 
 function PuttCounter() {
   const defaultRepSet = {
+    createdAt: new Date(),
     hits: 0,
     misses: 0,
     repGoal: 100,
-    undo: null,
+    undo: undefined,
   };
-  const [repSet, setRepSet] = useState<repSetType>(defaultRepSet);
+  const [repSet, setRepSet] = useState<repSetType>();
 
+  async function loadRepSet() {
+    let repSets = await get('repSets');
+    if (!repSets) {
+      repSets = [defaultRepSet]
+      set('repSets', repSets);
+    }
+    setRepSet(repSets[0]);
+  }
+  if (!repSet) loadRepSet();
 
-  function handleCounterButton(field: 'hits' | 'misses') {
-    setRepSet({...repSet, [field]: repSet[field] + 1});
+  async function updateRepSet(repSet: repSetType) {
+    let repSets = await get('repSets');
+    repSets[0] = repSet;
+    set('repSets', repSets);
+    setRepSet(repSet);
+ }
+
+  async function handleCounterButton(field: 'hits' | 'misses') {
+    updateRepSet({...repSet!, [field]: repSet![field] + 1, undo: repSet})
   }
 
   function handleUndo() {
-    setRepSet(repSet.undo!);
+    updateRepSet(repSet!.undo!);
   }
 
-  function handleNewRepSet() {
-    setRepSet(defaultRepSet);
+  async function handleNewRepSet() {
+    let repSets = await get('repSets');
+    set('repSets', [defaultRepSet, ...repSets]);
+    setRepSet(undefined);
   }
 
   function CounterButton({color, CounterIcon, onClick}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon, onClick: () => void}) {
@@ -96,40 +117,49 @@ function PuttCounter() {
 
   return (
     <Container>
-      <Paper className='header'>
-        <Grid container>
-          <Grid container item sm={6} xs={12}>
-            <Grid item md={6} xs={12}>
-              <CountLine label='Throws' count={repSet.hits + repSet.misses} outOf={repSet.repGoal} />
+      { !repSet ? (
+          <Paper className='header'>
+            <Typography variant='h4' align='center'>Loading...</Typography>
+          </Paper>
+      ) : (
+        <>
+          <Paper className='header'>
+            <Grid container>
+              <Grid container item sm={6} xs={12}>
+                <Grid item md={6} xs={12}>
+                  <CountLine label='Throws' count={repSet.hits + repSet.misses} outOf={repSet.repGoal} />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <CountLine label='Rep Goal' count={repSet.repGoal} outOf={0} />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <CountLine label='Hits' count={repSet.hits} outOf={repSet.hits + repSet.misses} />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <CountLine label='Misses' count={repSet.misses} outOf={repSet.hits + repSet.misses} />
+                </Grid>
+              </Grid>
+              <Grid container item sm={6} xs={12}>
+                <Grid item xs={12} style={{ padding: '0.5rem'}}>
+                  <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet.undo} onClick={handleNewRepSet}>Start New Rep Set</Button>
+                </Grid>
+                <Grid item xs={12} style={{ padding: '0.5rem'}}>
+                  <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!repSet.undo} onClick={handleUndo}>Undo</Button>
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid item md={6} xs={12}>
-              <CountLine label='Rep Goal' count={repSet.repGoal} outOf={0} />
+          </Paper>
+          <Grid container className='counter-button-grid'>
+            <Grid item sm={6} xs={12} className='counter-button'>
+              <CounterButton color='primary' CounterIcon={HitIcon}  onClick={() => handleCounterButton('hits')} />
             </Grid>
-            <Grid item md={6} xs={12}>
-              <CountLine label='Hits' count={repSet.hits} outOf={repSet.hits + repSet.misses} />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <CountLine label='Misses' count={repSet.misses} outOf={repSet.hits + repSet.misses} />
+            <Grid item sm={6} xs={12} className='counter-button'>
+              <CounterButton color='secondary' CounterIcon={MissIcon} onClick={() => handleCounterButton('misses')} />
             </Grid>
           </Grid>
-          <Grid container item sm={6} xs={12}>
-            <Grid item xs={12} style={{ padding: '0.5rem'}}>
-              <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!!repSet.undo} onClick={handleNewRepSet}>Start New Rep Set</Button>
-            </Grid>
-            <Grid item xs={12} style={{ padding: '0.5rem'}}>
-              <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!!repSet.undo} onClick={handleUndo}>Undo</Button>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Paper>
-      <Grid container className='counter-button-grid'>
-        <Grid item sm={6} xs={12} className='counter-button'>
-          <CounterButton color='primary' CounterIcon={HitIcon}  onClick={() => handleCounterButton('hits')} />
-        </Grid>
-        <Grid item sm={6} xs={12} className='counter-button'>
-          <CounterButton color='secondary' CounterIcon={MissIcon} onClick={() => handleCounterButton('misses')} />
-        </Grid>
-      </Grid>
+        </>
+        )
+      }
     </Container>
   );
 }
