@@ -43,34 +43,33 @@ const Container = styled.div`
   }
 `;
 
-type counterStateType = {
+type repSetType = {
   hits: number;
   misses: number;
   repGoal: number;
+  undo: repSetType | null;
 };
 
 function PuttCounter() {
-  const defaultCounterState = {
+  const defaultRepSet = {
     hits: 0,
     misses: 0,
-    repGoal: 100
+    repGoal: 100,
+    undo: null,
   };
-  const [counterState, setCounterState] = useState<counterStateType>(defaultCounterState);
-  const [undo, setUndo] = useState<counterStateType[]>([]);
+  const [repSet, setRepSet] = useState<repSetType>(defaultRepSet);
+
 
   function handleCounterButton(field: 'hits' | 'misses') {
-    setUndo([...undo, counterState]);
-    setCounterState({...counterState, [field]: counterState[field] + 1});
+    setRepSet({...repSet, [field]: repSet[field] + 1});
   }
 
   function handleUndo() {
-    setCounterState(undo.pop()!);
-    setUndo([...undo]);
+    setRepSet(repSet.undo!);
   }
 
   function handleNewRepSet() {
-    setCounterState(defaultCounterState);
-    setUndo([]);
+    setRepSet(defaultRepSet);
   }
 
   function CounterButton({color, CounterIcon, onClick}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon, onClick: () => void}) {
@@ -101,24 +100,24 @@ function PuttCounter() {
         <Grid container>
           <Grid container item sm={6} xs={12}>
             <Grid item md={6} xs={12}>
-              <CountLine label='Throws' count={counterState.hits + counterState.misses} outOf={counterState.repGoal} />
+              <CountLine label='Throws' count={repSet.hits + repSet.misses} outOf={repSet.repGoal} />
             </Grid>
             <Grid item md={6} xs={12}>
-              <CountLine label='Rep Goal' count={counterState.repGoal} outOf={0} />
+              <CountLine label='Rep Goal' count={repSet.repGoal} outOf={0} />
             </Grid>
             <Grid item md={6} xs={12}>
-              <CountLine label='Hits' count={counterState.hits} outOf={counterState.hits + counterState.misses} />
+              <CountLine label='Hits' count={repSet.hits} outOf={repSet.hits + repSet.misses} />
             </Grid>
             <Grid item md={6} xs={12}>
-              <CountLine label='Misses' count={counterState.misses} outOf={counterState.hits + counterState.misses} />
+              <CountLine label='Misses' count={repSet.misses} outOf={repSet.hits + repSet.misses} />
             </Grid>
           </Grid>
           <Grid container item sm={6} xs={12}>
             <Grid item xs={12} style={{ padding: '0.5rem'}}>
-              <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={undo.length === 0} onClick={handleNewRepSet}>Start New Rep Set</Button>
+              <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!!repSet.undo} onClick={handleNewRepSet}>Start New Rep Set</Button>
             </Grid>
             <Grid item xs={12} style={{ padding: '0.5rem'}}>
-              <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={undo.length === 0} onClick={handleUndo}>Undo</Button>
+              <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!!repSet.undo} onClick={handleUndo}>Undo</Button>
             </Grid>
           </Grid>
         </Grid>
