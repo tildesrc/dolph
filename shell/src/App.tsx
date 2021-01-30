@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import { Grid, Button, Typography, Box, Paper } from '@material-ui/core';
-import { CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo } from '@material-ui/icons';
+import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon } from '@material-ui/icons';
 import styled from '@emotion/styled';
 import numeral from 'numeral';
 
@@ -51,11 +51,12 @@ type counterStateType = {
 };
 
 function App() {
-  const [counterState, setCounterState] = useState<counterStateType>({
+  const defaultCounterState = {
     hits: 0,
     misses: 0,
     repGoal: 100
-  });
+  };
+  const [counterState, setCounterState] = useState<counterStateType>(defaultCounterState);
   const [undo, setUndo] = useState<counterStateType[]>([]);
 
   function handleCounterButton(field: 'hits' | 'misses') {
@@ -66,6 +67,11 @@ function App() {
   function handleUndo() {
     setCounterState(undo.pop()!);
     setUndo([...undo]);
+  }
+
+  function handleNewRepSet() {
+    setCounterState(defaultCounterState);
+    setUndo([]);
   }
 
   function CounterButton({color, CounterIcon, onClick}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon, onClick: () => void}) {
@@ -94,21 +100,27 @@ function App() {
     <PuttingCounter>
       <Paper className='header'>
         <Grid container>
-          <Grid item md={3} sm={6} xs={12}>
-            <CountLine label='Throws' count={counterState.hits + counterState.misses} outOf={counterState.repGoal} />
+          <Grid container item sm={6} xs={12}>
+            <Grid item md={6} xs={12}>
+              <CountLine label='Throws' count={counterState.hits + counterState.misses} outOf={counterState.repGoal} />
+            </Grid>
+            <Grid item md={6} xs={12}>
+              <CountLine label='Rep Goal' count={counterState.repGoal} outOf={0} />
+            </Grid>
+            <Grid item md={6} xs={12}>
+              <CountLine label='Hits' count={counterState.hits} outOf={counterState.hits + counterState.misses} />
+            </Grid>
+            <Grid item md={6} xs={12}>
+              <CountLine label='Misses' count={counterState.misses} outOf={counterState.hits + counterState.misses} />
+            </Grid>
           </Grid>
-          <Grid item md={3} sm={6} xs={12}>
-            <CountLine label='Rep Goal' count={counterState.repGoal} outOf={0} />
-          </Grid>
-          <Grid item md={6} />
-          <Grid item md={3} sm={6} xs={12}>
-            <CountLine label='Hits' count={counterState.hits} outOf={counterState.hits + counterState.misses} />
-          </Grid>
-          <Grid item md={3} sm={6} xs={12}>
-            <CountLine label='Misses' count={counterState.misses} outOf={counterState.hits + counterState.misses} />
-          </Grid>
-          <Grid item md={6} xs={12} style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem'}}>
-            <Button fullWidth variant='contained' startIcon={<Undo />} disabled={undo.length === 0} onClick={handleUndo}>Undo</Button>
+          <Grid container item sm={6} xs={12}>
+            <Grid item xs={12} style={{ padding: '0.5rem'}}>
+              <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={undo.length === 0} onClick={handleNewRepSet}>Start New Rep Set</Button>
+            </Grid>
+            <Grid item xs={12} style={{ padding: '0.5rem'}}>
+              <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={undo.length === 0} onClick={handleUndo}>Undo</Button>
+            </Grid>
           </Grid>
         </Grid>
       </Paper>
