@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import './App.css';
 import { Grid, Button, Typography, Box, Paper } from '@material-ui/core';
 import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon } from '@material-ui/icons';
 import styled from '@emotion/styled';
 import numeral from 'numeral';
 
-const PuttingCounter = styled.div`
+const Container = styled.div`
   position: absolute;
   left: 1%;
   top: 1%;
@@ -50,7 +49,7 @@ type counterStateType = {
   repGoal: number;
 };
 
-function App() {
+function PuttCounter() {
   const defaultCounterState = {
     hits: 0,
     misses: 0,
@@ -97,7 +96,7 @@ function App() {
   }
 
   return (
-    <PuttingCounter>
+    <Container>
       <Paper className='header'>
         <Grid container>
           <Grid container item sm={6} xs={12}>
@@ -132,9 +131,9 @@ function App() {
           <CounterButton color='secondary' CounterIcon={MissIcon} onClick={() => handleCounterButton('misses')} />
         </Grid>
       </Grid>
-    </PuttingCounter>
+    </Container>
   );
 }
 
-export default App;
+export default PuttCounter;
 
