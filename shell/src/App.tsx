@@ -78,13 +78,15 @@ function App() {
 
   function CountLine({count, outOf, label}: {count: number, outOf: number, label: string}) {
     return <Typography variant='h6' className='count-line'>
-              <Box fontWeight="bold">{label}:</Box>
-              <Box fontFamily='Monospace' className='count-number'>{count}</Box>
-              {!outOf ||
-                <Box fontFamily='Monospace' fontStyle='italic' className='count-number'>
-                  ({numeral(100 * count / outOf).format('0.00')}%)
-                </Box>
-              }
+              <>
+                <Box fontWeight="bold">{label}:</Box>
+                <Box fontFamily='Monospace' className='count-number'>{count}</Box>
+                {!outOf ||
+                  <Box fontFamily='Monospace' fontStyle='italic' className='count-number'>
+                    ({numeral(100 * count / outOf).format('0.00')}%)
+                  </Box>
+                }
+              </>
             </Typography>;
   }
 
