@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Grid, Button, Typography, Box } from '@material-ui/core';
-import { CallMissedOutgoing as MissIcon, SaveAlt as HitIcon } from '@material-ui/icons';
+import { Grid, Button, Typography, Box, Paper } from '@material-ui/core';
+import { CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo } from '@material-ui/icons';
 import styled from '@emotion/styled';
 import numeral from 'numeral';
 
 const PuttingCounter = styled.div`
   position: absolute;
-  height: 100%;
-  width: 100%;
+  left: 1%;
+  top: 1%;
+  height: 98%;
+  width: 98%;
   display: flex;
   flex-direction: column;
   .counter-button-grid {
     height: 100%;
     .counter-button {
-      button { height: 100%; }
+      button {
+        left: 1%;
+        top: 1%;
+        height: 98%;
+        width: 98%;
+      }
       .counter-icon {
         font-size: 10rem;
       }
@@ -22,11 +29,10 @@ const PuttingCounter = styled.div`
   }
   .header {
     margin: 0.5rem;
+    padding: 0.5rem;
     .count-line {
       display: flex;
-      paddingLeft: 0.5rem;
-      paddingRight: 0.5rem;
-      margin-left: 0.5rem;
+      padding-left: 0.5rem;
       .count-number {
         display: flex;
         flex-direction: column;
@@ -38,10 +44,33 @@ const PuttingCounter = styled.div`
   }
 `;
 
+type counterStateType = {
+  hits: number;
+  misses: number;
+  repGoal: number;
+};
+
 function App() {
-  function CounterButton({color, CounterIcon}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon}) {
+  const [counterState, setCounterState] = useState<counterStateType>({
+    hits: 0,
+    misses: 0,
+    repGoal: 100
+  });
+  const [undo, setUndo] = useState<counterStateType[]>([]);
+
+  function handleCounterButton(field: 'hits' | 'misses') {
+    setUndo([...undo, counterState]);
+    setCounterState({...counterState, [field]: counterState[field] + 1});
+  }
+
+  function handleUndo() {
+    setCounterState(undo.pop()!);
+    setUndo([...undo]);
+  }
+
+  function CounterButton({color, CounterIcon, onClick}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon, onClick: () => void}) {
     return (
-       <Button fullWidth size='large' color={color} variant='contained'>
+       <Button fullWidth size='large' color={color} variant='contained' onClick={onClick}>
          <CounterIcon className='counter-icon'/>
        </Button>
      );
@@ -61,19 +90,32 @@ function App() {
 
   return (
     <PuttingCounter>
-      <div className='header'>
+      <Paper className='header'>
         <Grid container>
-          <Grid xs={12}><CountLine label='Throws' count={3} outOf={10} /></Grid>
-          <Grid md={3} sm={6} xs={12}><CountLine label='Hits' count={1} outOf={3} /></Grid>
-          <Grid md={3} sm={6} xs={12}><CountLine label='Misses' count={2} outOf={3} /></Grid>
+          <Grid item md={3} sm={6} xs={12}>
+            <CountLine label='Throws' count={counterState.hits + counterState.misses} outOf={counterState.repGoal} />
+          </Grid>
+          <Grid item md={3} sm={6} xs={12}>
+            <CountLine label='Rep Goal' count={counterState.repGoal} outOf={0} />
+          </Grid>
+          <Grid item md={6} />
+          <Grid item md={3} sm={6} xs={12}>
+            <CountLine label='Hits' count={counterState.hits} outOf={counterState.hits + counterState.misses} />
+          </Grid>
+          <Grid item md={3} sm={6} xs={12}>
+            <CountLine label='Misses' count={counterState.misses} outOf={counterState.hits + counterState.misses} />
+          </Grid>
+          <Grid item md={6} xs={12} style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem'}}>
+            <Button fullWidth variant='contained' startIcon={<Undo />} disabled={undo.length === 0} onClick={handleUndo}>Undo</Button>
+          </Grid>
         </Grid>
-      </div>
+      </Paper>
       <Grid container className='counter-button-grid'>
         <Grid item sm={6} xs={12} className='counter-button'>
-          <CounterButton color='primary' CounterIcon={MissIcon} />
+          <CounterButton color='primary' CounterIcon={HitIcon}  onClick={() => handleCounterButton('hits')} />
         </Grid>
         <Grid item sm={6} xs={12} className='counter-button'>
-          <CounterButton color='secondary' CounterIcon={MissIcon} />
+          <CounterButton color='secondary' CounterIcon={MissIcon} onClick={() => handleCounterButton('misses')} />
         </Grid>
       </Grid>
     </PuttingCounter>
