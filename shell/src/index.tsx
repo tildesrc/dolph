@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PuttCounter from './PuttCounter';
+import PuttHistory from './PuttHistory';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import {
@@ -18,8 +19,11 @@ ReactDOM.render(
         <Route exact path="/">
           <Redirect to="/putt"/>
         </Route>
-        <Route path="/putt">
+        <Route exact path="/putt">
           <PuttCounter />
+        </Route>
+        <Route exact path="/putt/history">
+          <PuttHistory />
         </Route>
       </Switch>
     </Router>

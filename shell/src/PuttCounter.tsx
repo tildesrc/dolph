@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Grid, Button, Typography, Box, Paper } from '@material-ui/core';
 import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon } from '@material-ui/icons';
 import styled from '@emotion/styled';
-import numeral from 'numeral';
 import { get, set } from 'idb-keyval';
+import { FormatPercentage } from './common';
+import { repSetType } from './types';
 
 const Container = styled.div`
   position: absolute;
@@ -44,17 +45,13 @@ const Container = styled.div`
   }
 `;
 
-type repSetType = {
-  createdAt: Date;
-  hits: number;
-  misses: number;
-  repGoal: number;
-  undo: repSetType;
-} | undefined;
+function now() {
+  return new Date().toJSON();
+}
 
 function PuttCounter() {
   const defaultRepSet = {
-    createdAt: new Date(),
+    updatedAt: now(),
     hits: 0,
     misses: 0,
     repGoal: 100,
@@ -80,7 +77,7 @@ function PuttCounter() {
  }
 
   async function handleCounterButton(field: 'hits' | 'misses') {
-    updateRepSet({...repSet!, [field]: repSet![field] + 1, undo: repSet})
+    updateRepSet({...repSet!, updatedAt: now(), [field]: repSet![field] + 1, undo: repSet})
   }
 
   function handleUndo() {
@@ -108,7 +105,7 @@ function PuttCounter() {
                 <Box fontFamily='Monospace' className='count-number'>{count}</Box>
                 {!outOf ||
                   <Box fontFamily='Monospace' fontStyle='italic' className='count-number'>
-                    ({numeral(100 * count / outOf).format('0.00')}%)
+                    (<FormatPercentage>{count / outOf}</FormatPercentage>)
                   </Box>
                 }
               </>
