@@ -142,7 +142,7 @@ function PuttCounter() {
               </Grid>
               <Grid container item sm={6} xs={12}>
                 <Grid item xs={6} style={{ padding: '0.5rem'}}>
-                  <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet.undo} onClick={handleNewRepSet}>Start New Rep Set</Button>
+                  <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet.undo} onClick={handleNewRepSet}>New Set</Button>
                 </Grid>
                 <Grid item xs={6} style={{ padding: '0.5rem'}}>
                   <Button fullWidth variant='contained' startIcon={<Timeline />} onClick={() => history.push(PATHS.PUTTS.HISTORY)}>History</Button>
