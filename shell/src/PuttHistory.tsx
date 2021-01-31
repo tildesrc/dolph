@@ -3,14 +3,14 @@ import {CloudDownload, Delete} from '@material-ui/icons';
 import {get, set} from 'idb-keyval';
 import React, { createRef, useState, useEffect } from 'react';
 import { FormatPercentage } from './common';
-import { repSetType } from './types';
+import { RepSet } from './types';
 import { createObjectCsvStringifier } from 'csv-writer';
 
 export default function PuttHistory() {
-  let [repSets, setRepSets] = useState<repSetType[]>();
+  let [repSets, setRepSets] = useState<RepSet[]>();
 
   async function loadRepSets() {
-    setRepSets(await get('repSets'));
+    setRepSets((await get('repSets')).map((repSet: RepSet) => new RepSet({as: repSet})));
   }
   if (!repSets) loadRepSets();
 
@@ -78,19 +78,19 @@ export default function PuttHistory() {
               <FormatDate date={repSet.updatedAt} />
             </TableCell>
             <TableCell>
-              {repSet.hits + repSet.misses}
+              {repSet.throws}
             </TableCell>
             <TableCell>
               {repSet.hits}
             </TableCell>
             <TableCell>
-              <FormatPercentage>{repSet.hits / (repSet.hits + repSet.misses)}</FormatPercentage>
+              <FormatPercentage>{repSet.hits / repSet.throws}</FormatPercentage>
             </TableCell>
             <TableCell>
               {repSet.misses}
             </TableCell>
             <TableCell>
-              <FormatPercentage>{repSet.misses / (repSet.hits + repSet.misses)}</FormatPercentage>
+              <FormatPercentage>{repSet.misses / repSet.throws}</FormatPercentage>
             </TableCell>
           </TableRow>
         ))}

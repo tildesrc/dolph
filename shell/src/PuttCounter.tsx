@@ -4,7 +4,7 @@ import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as Hi
 import styled from '@emotion/styled';
 import { get, set } from 'idb-keyval';
 import { FormatPercentage } from './common';
-import { repSetType } from './types';
+import { RepSet } from './types';
 import {useHistory} from 'react-router-dom';
 import PATHS from './paths';
 
@@ -47,31 +47,20 @@ const Container = styled.div`
   }
 `;
 
-function now() {
-  return new Date().toJSON();
-}
-
 function PuttCounter() {
-  const defaultRepSet = {
-    updatedAt: now(),
-    hits: 0,
-    misses: 0,
-    repGoal: 100,
-    undo: undefined,
-  };
-  const [repSet, setRepSet] = useState<repSetType>();
+  const [repSet, setRepSet] = useState<RepSet>();
 
   async function loadRepSet() {
     let repSets = await get('repSets');
     if (!repSets) {
-      repSets = [defaultRepSet]
+      repSets = [new RepSet({goal: 100})]
       set('repSets', repSets);
     }
-    setRepSet(repSets[0]);
+    setRepSet(new RepSet({as: repSets[0]}));
   }
   if (!repSet) loadRepSet();
 
-  async function updateRepSet(repSet: repSetType) {
+  async function updateRepSet(repSet: RepSet) {
     let repSets = await get('repSets');
     repSets[0] = repSet;
     set('repSets', repSets);
@@ -79,7 +68,7 @@ function PuttCounter() {
  }
 
   async function handleCounterButton(field: 'hits' | 'misses') {
-    updateRepSet({...repSet!, updatedAt: now(), [field]: repSet![field] + 1, undo: repSet})
+    updateRepSet(new RepSet({from: repSet, [field]: repSet![field] + 1}));
   }
 
   function handleUndo() {
@@ -89,7 +78,7 @@ function PuttCounter() {
   async function handleNewRepSet() {
     let repSets = await get('repSets');
     set('repSets', [undefined, ...repSets]);
-    updateRepSet(defaultRepSet);
+    updateRepSet(new RepSet({goal: 100}));
   }
 
   let history = useHistory();
@@ -128,16 +117,16 @@ function PuttCounter() {
             <Grid container>
               <Grid container item sm={6} xs={12}>
                 <Grid item md={6} xs={12}>
-                  <CountLine label='Throws' count={repSet.hits + repSet.misses} outOf={repSet.repGoal} />
+                  <CountLine label='Throws' count={repSet.throws} outOf={repSet.goal} />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <CountLine label='Rep Goal' count={repSet.repGoal} outOf={0} />
+                  <CountLine label='Rep Goal' count={repSet.goal} outOf={0} />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <CountLine label='Hits' count={repSet.hits} outOf={repSet.hits + repSet.misses} />
+                  <CountLine label='Hits' count={repSet.hits} outOf={repSet.throws} />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <CountLine label='Misses' count={repSet.misses} outOf={repSet.hits + repSet.misses} />
+                  <CountLine label='Misses' count={repSet.misses} outOf={repSet.throws} />
                 </Grid>
               </Grid>
               <Grid container item sm={6} xs={12}>
