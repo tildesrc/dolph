@@ -4,10 +4,25 @@ import './index.css';
 import PuttCounter from './PuttCounter';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
-    <PuttCounter />
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <Redirect to="/putt"/>
+        </Route>
+        <Route path="/putt">
+          <PuttCounter />
+        </Route>
+      </Switch>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
