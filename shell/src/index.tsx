@@ -15,7 +15,7 @@ import PATHS from './paths';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
+    <Router basename="/dolph">
       <Switch>
         <Route exact path="/">
           <Redirect to={PATHS.PUTTS.COUNTER} />
