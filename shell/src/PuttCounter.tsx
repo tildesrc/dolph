@@ -70,7 +70,7 @@ function PuttCounter() {
 
   function CounterButton({color, CounterIcon, onClick}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon, onClick: () => void}) {
     return (
-       <Button fullWidth size='large' color={color} variant='contained' onClick={onClick}>
+       <Button fullWidth size='large' color={color} variant='contained' onClick={onClick} disabled={!repSet}>
          <CounterIcon className='counter-icon'/>
        </Button>
      );
@@ -92,64 +92,61 @@ function PuttCounter() {
 
   return (
     <StyledContainer>
-      { !repSet ? (
-          <Card>
-            <Typography variant='h4' align='center'>Loading...</Typography>
-          </Card>
-      ) : (
-        <>
-          <Grid container>
-            <Grid item xs={12} spacing={2} className='main-card'>
-              <Card>
-                <CardContent>
-                  <Grid container>
-                    <Grid container item sm={6} xs={12}>
-                      <Grid item md={6} xs={12}>
-                        <CountLine label='Throws' count={repSet.throws} outOf={repSet.goal} />
+      <>
+        <Grid container>
+          <Grid item xs={12} spacing={2} className='main-card'>
+            <Card>
+              <CardContent>
+                { !repSet ? (
+                    <Typography variant='h4' align='center'>Loading...</Typography>
+                ) : (
+                    <Grid container>
+                      <Grid container item sm={6} xs={12}>
+                        <Grid item md={6} xs={12}>
+                          <CountLine label='Throws' count={repSet.throws} outOf={repSet.goal} />
+                        </Grid>
+                        <Grid item md={6} xs={12}>
+                          <CountLine label='Rep Goal' count={repSet.goal} outOf={0} />
+                        </Grid>
+                        <Grid item md={6} xs={12}>
+                          <CountLine label='Hits' count={repSet.hits} outOf={repSet.throws} />
+                        </Grid>
+                        <Grid item md={6} xs={12}>
+                          <CountLine label='Misses' count={repSet.misses} outOf={repSet.throws} />
+                        </Grid>
                       </Grid>
-                      <Grid item md={6} xs={12}>
-                        <CountLine label='Rep Goal' count={repSet.goal} outOf={0} />
-                      </Grid>
-                      <Grid item md={6} xs={12}>
-                        <CountLine label='Hits' count={repSet.hits} outOf={repSet.throws} />
-                      </Grid>
-                      <Grid item md={6} xs={12}>
-                        <CountLine label='Misses' count={repSet.misses} outOf={repSet.throws} />
+                      <Grid container item sm={6} xs={12}>
+                        <Grid item xs={6} style={{ padding: '0.5rem'}}>
+                          <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet.undo} onClick={handleNewRepSet}>New Set</Button>
+                        </Grid>
+                        <Grid item xs={6} style={{ padding: '0.5rem'}}>
+                          <Button fullWidth variant='contained' startIcon={<Timeline />} onClick={() => history.push(PATHS.PUTTS.HISTORY)}>History</Button>
+                        </Grid>
+                        <Grid item xs={12} style={{ padding: '0.5rem'}}>
+                          <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!repSet.undo} onClick={handleUndo}>Undo</Button>
+                        </Grid>
                       </Grid>
                     </Grid>
-                    <Grid container item sm={6} xs={12}>
-                      <Grid item xs={6} style={{ padding: '0.5rem'}}>
-                        <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet.undo} onClick={handleNewRepSet}>New Set</Button>
-                      </Grid>
-                      <Grid item xs={6} style={{ padding: '0.5rem'}}>
-                        <Button fullWidth variant='contained' startIcon={<Timeline />} onClick={() => history.push(PATHS.PUTTS.HISTORY)}>History</Button>
-                      </Grid>
-                      <Grid item xs={12} style={{ padding: '0.5rem'}}>
-                        <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!repSet.undo} onClick={handleUndo}>Undo</Button>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} className='main-card'>
-              <Card>
-                <CardContent>
-                  <Grid container className='counter-button-grid'>
-                    <Grid item sm={6} xs={12} className='counter-button'>
-                      <CounterButton color='primary' CounterIcon={HitIcon}  onClick={() => handleCounterButton('hits')} />
-                    </Grid>
-                    <Grid item sm={6} xs={12} className='counter-button'>
-                      <CounterButton color='secondary' CounterIcon={MissIcon} onClick={() => handleCounterButton('misses')} />
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
+                  )}
+              </CardContent>
+            </Card>
           </Grid>
-        </>
-        )
-      }
+          <Grid item xs={12} className='main-card'>
+            <Card>
+              <CardContent>
+                <Grid container className='counter-button-grid'>
+                  <Grid item sm={6} xs={12} className='counter-button'>
+                    <CounterButton color='primary' CounterIcon={HitIcon} onClick={() => handleCounterButton('hits')} />
+                  </Grid>
+                  <Grid item sm={6} xs={12} className='counter-button'>
+                    <CounterButton color='secondary' CounterIcon={MissIcon} onClick={() => handleCounterButton('misses')} />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </>
     </StyledContainer>
   );
 }
