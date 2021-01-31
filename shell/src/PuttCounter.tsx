@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Grid, Button, Typography, Box, Paper } from '@material-ui/core';
-import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon } from '@material-ui/icons';
+import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon, Timeline } from '@material-ui/icons';
 import styled from '@emotion/styled';
 import { get, set } from 'idb-keyval';
 import { FormatPercentage } from './common';
 import { repSetType } from './types';
+import {useHistory} from 'react-router-dom';
+import PATHS from './paths';
 
 const Container = styled.div`
   position: absolute;
@@ -90,6 +92,8 @@ function PuttCounter() {
     updateRepSet(defaultRepSet);
   }
 
+  let history = useHistory();
+
   function CounterButton({color, CounterIcon, onClick}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon, onClick: () => void}) {
     return (
        <Button fullWidth size='large' color={color} variant='contained' onClick={onClick}>
@@ -137,8 +141,11 @@ function PuttCounter() {
                 </Grid>
               </Grid>
               <Grid container item sm={6} xs={12}>
-                <Grid item xs={12} style={{ padding: '0.5rem'}}>
+                <Grid item xs={6} style={{ padding: '0.5rem'}}>
                   <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet.undo} onClick={handleNewRepSet}>Start New Rep Set</Button>
+                </Grid>
+                <Grid item xs={6} style={{ padding: '0.5rem'}}>
+                  <Button fullWidth variant='contained' startIcon={<Timeline />} onClick={() => history.push(PATHS.PUTTS.HISTORY)}>History</Button>
                 </Grid>
                 <Grid item xs={12} style={{ padding: '0.5rem'}}>
                   <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!repSet.undo} onClick={handleUndo}>Undo</Button>

@@ -11,18 +11,19 @@ import {
   Route,
   Redirect
 } from "react-router-dom";
+import PATHS from './paths';
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Switch>
         <Route exact path="/">
-          <Redirect to="/putt"/>
+          <Redirect to={PATHS.PUTTS.COUNTER} />
         </Route>
-        <Route exact path="/putt">
+        <Route exact path={PATHS.PUTTS.COUNTER}>
           <PuttCounter />
         </Route>
-        <Route exact path="/putt/history">
+        <Route exact path={PATHS.PUTTS.HISTORY}>
           <PuttHistory />
         </Route>
       </Switch>
