@@ -1,6 +1,6 @@
 {
   "name": "dolph-shell",
-  "homepage": "http://dolph.tildesrc.com",
+  "homepage": "http://tildesrc.com/dolph",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
