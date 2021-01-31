@@ -86,8 +86,8 @@ function PuttCounter() {
 
   async function handleNewRepSet() {
     let repSets = await get('repSets');
-    set('repSets', [defaultRepSet, ...repSets]);
-    setRepSet(undefined);
+    set('repSets', [undefined, ...repSets]);
+    updateRepSet(defaultRepSet);
   }
 
   function CounterButton({color, CounterIcon, onClick}: {color: 'primary' | 'secondary', CounterIcon: typeof HitIcon | typeof MissIcon, onClick: () => void}) {
