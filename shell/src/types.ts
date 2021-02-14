@@ -14,12 +14,13 @@ export class RepSet {
   undo: RepSet | undefined;
 
   constructor(params : RepSetConstructor) {
-    this.updatedAt = new Date().toJSON();
     let {
       hits = 0,
       misses = 0,
       goal,
-    } = params?.as ?? {...params.from, ...params};
+      updatedAt
+    } = params?.as ?? {...{...params.from, updatedAt: undefined}, ...params};
+    this.updatedAt = updatedAt ?? new Date().toJSON();
     this.hits = hits;
     this.misses = misses;
     this.goal = goal;
