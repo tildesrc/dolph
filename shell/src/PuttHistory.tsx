@@ -2,7 +2,7 @@ import {IconButton, Table, TableBody, TableCell, TableHead, TableRow} from '@mat
 import {CloudDownload, Delete} from '@material-ui/icons';
 import {get, set} from 'idb-keyval';
 import React, { createRef, useState, useEffect } from 'react';
-import { FormatPercentage } from './common';
+import { FormatDate, FormatPercentage } from './common';
 import { RepSet } from './types';
 import { createObjectCsvStringifier } from 'csv-writer';
 
@@ -13,10 +13,6 @@ export default function PuttHistory() {
     setRepSets((await get('repSets')).map((repSet: RepSet) => new RepSet({as: repSet})));
   }
   if (!repSets) loadRepSets();
-
-  function FormatDate({ date }: {date: string}) {
-    return (<div>{Intl.DateTimeFormat(navigator.language, { minute: 'numeric', hour: 'numeric', month: 'numeric', day: 'numeric', year: 'numeric' }).format(new Date(date))}</div>)
-  }
 
   async function handleDelete(deleteIdx: number) {
     repSets = repSets!.filter((__, idx) => idx !== deleteIdx);

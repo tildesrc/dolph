@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Container, Grid, Button, Typography, Box, Card, CardContent, Collapse, Grow } from '@material-ui/core';
-import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon, Timeline, Cached } from '@material-ui/icons';
+import { Container, Grid, Button, Typography, Box, Card, CardContent, Collapse, Grow, CardHeader, IconButton } from '@material-ui/core';
+import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon, Timeline, Cached, ExpandMore, ExpandLess } from '@material-ui/icons';
 import styled from '@emotion/styled';
 import { get, set } from 'idb-keyval';
-import { FormatPercentage } from './common';
+import { FormatDate, FormatPercentage } from './common';
 import { RepSet } from './types';
 import {useHistory} from 'react-router-dom';
 import PATHS from './paths';
@@ -34,6 +34,7 @@ const StyledContainer = styled(Container)`
 
 function PuttCounter() {
   const [repSet, setRepSet] = useState<RepSet>();
+  const [showProgress, setShowProgress] = useState<boolean>(false);
 
   async function loadRepSet() {
     let repSets = await get('repSets');
@@ -111,35 +112,61 @@ function PuttCounter() {
               <Grid container>
                 <Grid item xs={12} spacing={2} className='main-card'>
                   <Card>
-                    <CardContent>
-                      <Grid container>
-                        <Grid container item sm={6} xs={12}>
-                          <Grid item md={6} xs={12}>
-                            <CountLine label='Throws' count={repSet?.throws} outOf={repSet?.goal} />
+                    <CardHeader
+                      title={!repSet || (<FormatDate date={repSet?.updatedAt} />)}
+                      subheader={!repSet  ||
+                          (<Typography className='count-line' variant='h5'>
+                            <Box fontFamily='Monospace' style={{display: 'flex'}}>
+                              <Box color='primary.main'>
+                                {repSet?.hits}
+                              </Box>
+                              +
+                              <Box color='secondary.main'>
+                                {repSet?.misses}
+                              </Box>
+                              =
+                              {repSet?.throws}
+                            </Box>
+                            {!!repSet?.throws && (<Box className='count-number' fontFamily='Monospace' fontStyle='italic'>(<FormatPercentage>{repSet?.hits / repSet?.throws}</FormatPercentage>)</Box>)}
+                          </Typography>)
+                      }
+                      action={
+                        <IconButton style={{marginLeft: 'auto'}} onClick={() => setShowProgress(!showProgress)}>
+                          {showProgress ? (<ExpandLess/>) : (<ExpandMore/>)}
+                        </IconButton>
+                      }
+                    />
+                    <Collapse in={showProgress}>
+                      <CardContent>
+                        <Grid container>
+                          <Grid container item sm={6} xs={12}>
+                            <Grid item md={6} xs={12}>
+                              <CountLine label='Throws' count={repSet?.throws} outOf={repSet?.goal} />
+                            </Grid>
+                            <Grid item md={6} xs={12}>
+                              <CountLine label='Rep Goal' count={repSet?.goal} outOf={0} />
+                            </Grid>
+                            <Grid item md={6} xs={12}>
+                              <CountLine label='Hits' count={repSet?.hits} outOf={repSet?.throws} />
+                            </Grid>
+                            <Grid item md={6} xs={12}>
+                              <CountLine label='Misses' count={repSet?.misses} outOf={repSet?.throws} />
+                            </Grid>
                           </Grid>
-                          <Grid item md={6} xs={12}>
-                            <CountLine label='Rep Goal' count={repSet?.goal} outOf={0} />
-                          </Grid>
-                          <Grid item md={6} xs={12}>
-                            <CountLine label='Hits' count={repSet?.hits} outOf={repSet?.throws} />
-                          </Grid>
-                          <Grid item md={6} xs={12}>
-                            <CountLine label='Misses' count={repSet?.misses} outOf={repSet?.throws} />
+                          <Grid container item sm={6} xs={12}>
+                            <Grid item xs={6} style={{ padding: '0.5rem'}}>
+                              <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet?.undo} onClick={handleNewRepSet}>New Set</Button>
+                            </Grid>
+                            <Grid item xs={6} style={{ padding: '0.5rem'}}>
+                              <Button fullWidth variant='contained' startIcon={<Timeline />} onClick={() => history.push(PATHS.PUTTS.HISTORY)}>History</Button>
+                            </Grid>
+                            <Grid item xs={12} style={{ padding: '0.5rem'}}>
+                              <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!repSet?.undo} onClick={handleUndo}>Undo</Button>
+                            </Grid>
                           </Grid>
                         </Grid>
-                        <Grid container item sm={6} xs={12}>
-                          <Grid item xs={6} style={{ padding: '0.5rem'}}>
-                            <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet?.undo} onClick={handleNewRepSet}>New Set</Button>
-                          </Grid>
-                          <Grid item xs={6} style={{ padding: '0.5rem'}}>
-                            <Button fullWidth variant='contained' startIcon={<Timeline />} onClick={() => history.push(PATHS.PUTTS.HISTORY)}>History</Button>
-                          </Grid>
-                          <Grid item xs={12} style={{ padding: '0.5rem'}}>
-                            <Button fullWidth variant='contained' startIcon={<UndoIcon />} disabled={!repSet?.undo} onClick={handleUndo}>Undo</Button>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
+                      </CardContent>
+                    </Collapse>
                   </Card>
                 </Grid>
                 <Grid item xs={12} className='main-card'>
