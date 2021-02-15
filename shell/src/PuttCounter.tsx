@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Grid, Button, Typography, Box, Card, CardContent, Collapse, Grow, CardHeader, IconButton } from '@material-ui/core';
-import { Refresh as NewRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon, Timeline, Cached, ExpandMore, ExpandLess } from '@material-ui/icons';
+import { Refresh as CompleteRepSetIcon, CallMissedOutgoing as MissIcon, SaveAlt as HitIcon, Undo as UndoIcon, Timeline, Cached, ExpandMore, ExpandLess } from '@material-ui/icons';
 import styled from '@emotion/styled';
 import { get, set } from 'idb-keyval';
 import { FormatDate, FormatPercentage } from './common';
@@ -61,7 +61,7 @@ function PuttCounter() {
     updateRepSet(repSet!.undo!);
   }
 
-  async function handleNewRepSet() {
+  async function handleCompleteRepSet() {
     let repSets = await get('repSets');
     set('repSets', [undefined, ...repSets]);
     updateRepSet(new RepSet({goal: 100}));
@@ -155,7 +155,7 @@ function PuttCounter() {
                           </Grid>
                           <Grid container item sm={6} xs={12}>
                             <Grid item xs={6} style={{ padding: '0.5rem'}}>
-                              <Button fullWidth variant='contained' startIcon={<NewRepSetIcon />} disabled={!repSet?.undo} onClick={handleNewRepSet}>New Set</Button>
+                              <Button fullWidth variant='contained' startIcon={<CompleteRepSetIcon />} disabled={!repSet?.undo} onClick={handleCompleteRepSet}>Complete Set</Button>
                             </Grid>
                             <Grid item xs={6} style={{ padding: '0.5rem'}}>
                               <Button fullWidth variant='contained' startIcon={<Timeline />} onClick={() => history.push(PATHS.PUTTS.HISTORY)}>History</Button>
